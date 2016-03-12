@@ -7,10 +7,10 @@
 #include <vector>
 
 // DEBUG!
-/*
 #include <bitset>
 #include <iostream>
-*/
+#include <cassert>
+
 
 template <typename T, typename Iterator>
 class path
@@ -29,6 +29,11 @@ public:
 	bool contains_vertex(index_t v) const
 	{
 		return static_cast<const T* const>(this)->contains_vertex(v);
+	}
+
+	index_t size() const
+	{
+		return static_cast<const T* const>(this)->size();
 	}
 
 	Iterator cbegin() const
@@ -73,6 +78,11 @@ public:
 		return p_[v];
 	}
 
+	bool size() const
+	{
+		return p_.size();
+	}
+
 	typedef std::vector<bool>::const_iterator Iterator;
 
 	Iterator cbegin() const 
@@ -94,22 +104,46 @@ void drop_endpoints(vertex_path& p);
 
 class edge_path : public path<edge_path, std::vector<index_t>::const_iterator>
 {
-public:
-	edge_path() { }
+public: // 1ULL
+	edge_path() : visited_(0)
+	{
+		assert(visited_ == 0);
+		assert(edges_.empty());
+	}
+
+	edge_path(index_t s)
+	{
+		//discover_vertex(s);
+	}
 
 	void discover_vertex(index_t v)
 	{
+		visited_ |= (1ULL << v);
 		edges_.emplace_back(v);
 	}
 
 	void backtrack_vertex(index_t v)
 	{
+		visited_ &= ~(1ULL << v);
 		edges_.pop_back();
 	}
 
 	bool contains_vertex(index_t v) const
 	{
-		return std::find(edges_.cbegin(), edges_.cend(), v) != edges_.cend();
+		//return visited_ & (1ULL << v);
+		return bittest64(visited_, v);
+	}
+
+	index_t size() const
+	{
+		return edges_.size() - 1;
+	}
+
+	void print() const
+	{
+		for (auto x : edges_)
+			std::cout << x << " ";
+		std::cout << "\n";
 	}
 
 	typedef std::vector<index_t>::const_iterator Iterator;
@@ -125,6 +159,7 @@ public:
 	}
 
 private:
+	index_t visited_;
 	std::vector<index_t> edges_;
 };
 
