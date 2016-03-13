@@ -38,11 +38,17 @@ void print_graph(const graph& g);
 
 graph build_clique(index_t n);
 
+graph build_path(index_t n);
+
 graph build_biclique(index_t p, index_t q);
 
 graph build_star(index_t l);
 
 graph build_cycle(index_t n);
+
+graph build_wheel(index_t spokes);
+
+graph build_corona(index_t n);
 
 graph build_random_graph(index_t n, double p);
 

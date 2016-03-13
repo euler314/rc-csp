@@ -6,6 +6,7 @@
 
 #include "model_writer.hpp"
 #include "strong_model_writer.hpp"
+#include "minion_model_writer.hpp"
 
 #include <iostream>
 #include <bitset>
@@ -49,12 +50,9 @@ graph forest_example(index_t n, index_t p, double prob)
 int main()
 {
 	std::ios_base::sync_with_stdio(false);
-
+	/*
 	//const index_t n = 14;
 	//graph g = forest_example(n, 4, 0.4);
-
-	const index_t n = 4;
-	graph g = build_cycle(n);
 
 	if (!is_connected(g))
 	{
@@ -65,17 +63,38 @@ int main()
 	const int k = 4; //get_diameter(g);
 	
 	std::ofstream file("foo.txt");
-	strong_model_writer writer(g, k, std::cout);
+	//strong_model_writer writer(g, k, std::cout);
+	minion_model_writer writer(g, k, std::cout);
 
 	auto start = std::chrono::high_resolution_clock::now();
-	writer.write();
-	writer.add_line("% foo");
-
-	//build_minion_rc_model(g, k, file);
+	//writer.write();
 
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - start);
 
 	std::cerr << "\nElapsed time: " << (duration.count() / 1000.0) << " s\n";
+
+	*/
+
+	//const index_t n = 2;
+	//graph g = build_star(n);
+	//create_rainbow_polynomial_points(g);
+
+	for (index_t i = 3; i <= 9; ++i)
+	{
+		graph g = build_cycle(i);
+		std::cerr << "sc" << i << " = ";
+		auto sols = polynomial_points<strong_minion_model_writer>(g);
+
+		std::cerr << "\nInterpolatingPolynomial[{";
+		for (index_t i = 0; i < sols.size(); ++i)
+		{
+			std::cerr << "{" << i << "," << sols[i] << "}";
+
+			if (i != sols.size() - 1)
+				std::cerr << ", ";
+		}
+		std::cerr << "}, x];\n";
+	}
 
 	std::cin.get();
 }

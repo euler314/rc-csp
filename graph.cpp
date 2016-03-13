@@ -125,6 +125,18 @@ graph build_clique(index_t n)
 	return g;
 }
 
+graph build_path(index_t n)
+{
+	graph g(n);
+
+	for (index_t i = 0; i < (n - 1); ++i)
+	{
+		g.add_edge(i, i + 1);
+	}
+
+	return g;
+}
+
 graph build_biclique(index_t p, index_t q)
 {
 	graph g(p + q);
@@ -156,12 +168,52 @@ graph build_cycle(index_t n)
 {
 	graph g(n);
 
-	for (int i = 0; i < (n - 1); ++i)
+	for (index_t i = 0; i < (n - 1); ++i)
 	{
 		g.add_edge(i, i + 1);
 	}
 
 	g.add_edge(0, n - 1);
+
+	return g;
+}
+
+graph build_wheel(index_t spokes)
+{
+	const index_t n = spokes;
+	graph g(n + 1);
+
+	for (index_t i = 0; i < (n - 1); ++i)
+	{
+		g.add_edge(i, i + 1);
+	}
+
+	g.add_edge(0, n - 1);
+
+	for (index_t i = 0; i < n; ++i)
+	{
+		g.add_edge(n, i);
+	}
+	
+	return g;
+}
+
+graph build_corona(index_t n)
+{
+	graph g(2 * n);
+
+	for (index_t i = 0; i < n; ++i)
+	{
+		for (index_t j = i + 1; j < n; ++j)
+		{
+			g.add_edge(i, j);
+		}
+	}
+
+	for (index_t i = 0; i < n; ++i)
+	{
+		g.add_edge(i, n + i);
+	}
 
 	return g;
 }

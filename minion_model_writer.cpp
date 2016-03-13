@@ -3,26 +3,14 @@
 
 #include "graph.hpp"
 #include <string>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <sstream>
+#include <chrono>
 
 namespace
 {
-	const std::string VAR_PREFIX = "x";
-
-	void add_minion_variables(const graph& g, index_t k, std::ostream& os)
-	{
-		const index_t n = g.num_vertices();
-
-		for (index_t i = 0; i < n; ++i)
-		{
-			index_t adj = g.adj_[i];
-			for (index_t j = i; j < n; ++j)
-			{
-				if (adj & (1 << j))
-					os << "DISCRETE " << VAR_PREFIX << i << "_" << j << " {1.." << k << "}\n";
-			}
-		}
-	}
-
 	void add_minion_alldiff(const std::vector<index_t>& edges, std::ostream& os)
 	{
 		os << "alldiff([";
@@ -68,7 +56,37 @@ void minion_model_writer::impl_process_vertex_pair(index_t u, index_t v)
 
 	os << get_comment() << u << " " << v << "\n";
 	std::vector<edge_path> paths;
-	list_paths(get_graph(), u, v, paths, get_solution_size());
+	// No path pruning: generate paths of all lengths.
+	// It is up to the user to make sure this is sensible.
+	// For example, if k < diam(G), the instance is trivially UNSAT.
+	list_paths(get_graph(), u, v, paths, std::numeric_limits<index_t>::max());
+
+	// MINION can't handle empty constraints such as "watched-or({ })"
+	//if (paths.size() < 2)
+	//	return;
+
+	os << "watched-or({";
+
+	for (index_t j = 0; j < paths.size(); ++j)
+	{
+		//if (paths[j].size())
+
+		add_minion_alldiff(paths[j], os);
+
+		if (j != paths.size() - 1)
+			os << ", ";
+	}
+
+	os << "})\n";
+}
+
+void strong_minion_model_writer::impl_process_vertex_pair(index_t u, index_t v)
+{
+	auto& os = get_output_stream();
+
+	os << get_comment() << u << " " << v << "\n";
+	std::vector<edge_path> paths;
+	list_shortest_paths(get_graph(), u, v, paths);
 
 	os << "watched-or({";
 

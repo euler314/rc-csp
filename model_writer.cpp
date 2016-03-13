@@ -93,8 +93,6 @@ void model_writer::add_line(const std::string& line)
 
 void model_writer::impl_process()
 {
-	//add_path_constraints(g_, k_, os_);
-
 	index_t u = 0;
 	index_t v = 1;
 	const index_t n = g_.num_vertices();
@@ -111,7 +109,6 @@ void model_writer::impl_process()
 
 		next_pair(u, v, n);
 	}
-
 }
 
 void model_writer::impl_preprocess()
