@@ -42,8 +42,11 @@ private:
 	const std::string comment_;
 };
 
+void prepare_model(index_t k, std::ostream& os);
+
 void add_alldiff(const std::vector<index_t>& edges, std::ostream& os);
 void add_alldiff(const edge_path& p, std::ostream& os);
+void add_alldiff(const vertex_path& p, std::ostream& os);
 
 void enforce_path(model_writer& w, const edge_path& p);
 
