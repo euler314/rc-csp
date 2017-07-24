@@ -13,12 +13,6 @@ namespace
 	const std::string VAR_PREFIX = "x";
 	const std::string VAR_DECL = "var 1..k: " + VAR_PREFIX;
 
-	void prepare_model(index_t k, std::ostream& os)
-	{
-		os << "include \"alldifferent.mzn\";\n";
-		os << "int: k=" << k << ";\n";
-	}
-
 	void add_vertex_variables(const graph& g, std::ostream& os)
 	{
 		const index_t n = g.num_vertices();
@@ -79,6 +73,12 @@ namespace
 	}
 }
 
+void prepare_model(index_t k, std::ostream& os)
+{
+	os << "include \"alldifferent.mzn\";\n";
+	os << "int: k=" << k << ";\n";
+}
+
 void model_writer::write()
 {
 	impl_preprocess();
@@ -130,6 +130,8 @@ void model_writer::impl_postprocess()
 		add_alldiff(bridges, os_);
 		os_ << ");\n";
 	}
+
+	os_ << "solve satisfy;";
 }
 
 void model_writer::impl_process_vertex_pair(index_t u, index_t v)
@@ -169,6 +171,23 @@ void add_alldiff(const std::vector<index_t>& edges, std::ostream& os)
 void add_alldiff(const edge_path& p, std::ostream& os)
 {
 	add_alldiff(to_edge_list(p), os);
+}
+
+void add_alldiff(const vertex_path& p, std::ostream& os)
+{
+	std::vector<index_t> ints = to_internal_list(p);
+
+	os << "alldifferent([";
+
+	for (auto it = ints.cbegin(); it != ints.cend(); ++it)
+	{
+		os << VAR_PREFIX << *(it);
+
+		if (it != (ints.cend() - 1))
+			os << ",";
+	}
+
+	os << "]) ";
 }
 
 void enforce_path(model_writer& w, const edge_path& p)
